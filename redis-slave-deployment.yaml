@@ -1,0 +1,40 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: redis-ha
+  labels:
+    redis-node: "true"
+    app: redis-ha
+spec:
+  serviceName: "redis-ha"
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        name: redis
+        app: redis-ha
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: redis
+        image: "gcr.io/talk2vinocloud/redis:v1"
+        resources:
+          limits:
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+        - mountPath: /data
+          name: redis-slave-data
+  volumeClaimTemplates:
+  - metadata:
+      name: redis-slave-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 20Gi

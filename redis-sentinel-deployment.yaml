@@ -1,0 +1,29 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: redis-ha-sentinel
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        name: redis-sentinel
+        redis-sentinel: "true"
+        role: sentinel
+        app: redis-ha
+    spec:
+      containers:
+      - name: sentinel
+        image: gcr.io/talk2vinocloud/redis:v1
+        resources:
+          limits:
+            memory: 700Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+
+        env:
+          - name: SENTINEL
+            value: "true"
+        ports:
+          - containerPort: 26379
